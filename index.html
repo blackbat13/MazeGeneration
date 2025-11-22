@@ -110,8 +110,21 @@
             drawGrid();
         });
 
+        function animate(stack) {
+            if (stack.length === 0) return;
+            let [row, col, wall] = stack.pop();
+            if (wall === 'right') {
+                maze[row][col].right = false;
+            } else if (wall === 'bottom') {
+                maze[row][col].bottom = false;
+            }
+            drawGrid();
+            requestAnimationFrame(() => animate(stack));
+        }
+
         function recursiveBacktracker() {
             let visited = Array.from({ length: rows }, () => Array(cols).fill(false));
+            let stack = [];
             function run(row, col) {
                 if (row < 0 || col < 0 || row >= rows || col >= cols || visited[row][col]) {
                     return;
@@ -130,22 +143,32 @@
                     if (newRow >= 0 && newCol >= 0 && newRow < rows && newCol < cols && !visited[newRow][newCol]) {
                         if (wall === 'right') {
                             maze[row][col].right = false;
+                            stack.push([row, col, "right"]);
                         } else if (wall === 'bottom') {
                             maze[row][col].bottom = false;
+                            stack.push([row, col, "bottom"]);
                         } else if (wall === 'left') {
                             maze[newRow][newCol].right = false;
+                            stack.push([newRow, newCol, "right"]);
                         } else if (wall === 'top') {
                             maze[newRow][newCol].bottom = false;
+                            stack.push([newRow, newCol, "bottom"]);
                         }
                         run(newRow, newCol);
                     }
                 }
             }
+            
             run(0, 0);
+            maze = Array.from({ length: rows }, () => 
+                Array.from({ length: cols }, () => ({right: true, bottom: true}))
+            );
             drawGrid();
+            animate(stack);
         }
 
         function binaryTree() {
+            let stack = [];
             for (let i = 0; i < rows; i++) {
                 for (let j = 0; j < cols; j++) {
                     let directions = [];
@@ -155,13 +178,20 @@
                         let choice = directions[Math.floor(Math.random() * directions.length)];
                         if (choice === 'right') {
                             maze[i][j].right = false;
+                            stack.push([i, j, "right"]);
                         } else if (choice === 'bottom') {
                             maze[i][j].bottom = false;
+                            stack.push([i, j, "bottom"]);
                         }
                     }
                 }
             }
+
+            maze = Array.from({ length: rows }, () => 
+                Array.from({ length: cols }, () => ({right: true, bottom: true}))
+            );
             drawGrid();
+            animate(stack);
         }
 
         function generateMaze() {
@@ -173,6 +203,8 @@
             maze = Array.from({ length: rows }, () => 
                 Array.from({ length: cols }, () => ({right: true, bottom: true}))
             );
+
+            drawGrid();
 
             const algorithm = document.getElementById('algorithmSelect').value;
             if (algorithm === 'recursiveBacktracker') {
