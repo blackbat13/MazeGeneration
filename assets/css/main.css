@@ -1,0 +1,13 @@
+body, #mainContainer {
+    margin: 0;
+    padding: 2px !important;
+    overflow: hidden;
+}
+
+#controlPanel{
+    padding: 20px;
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+    color: #333;
+    background-color: #f4f4f4;
+}
